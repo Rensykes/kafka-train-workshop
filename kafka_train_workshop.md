@@ -7,11 +7,12 @@ In this workshop, you will build a multi-service, multi-language event-driven sy
 This project demonstrates core Kafka concepts like:
 - Producers and Consumers
 - Topics, Partitions, and Consumer Groups
+- Partition Rebalancing
 - Language Interoperability (Java & Python)
 - Stateful Stream Processing with Kafka Streams
 - Real-time data visualization with WebSockets
 
-**Note on Architecture:** For the sake of simplicity in this workshop, we used the same package structure across all Java applications to make the serialized objects (like `TrainLocation`) available across all services. In a real-world scenario, you should handle shared data models differently by:
+**Note on Architecture:** For the sake of simplicity in this workshop, we used the same package structure across all Java applications to make the serialized objects (like `TrainPosition`) available across all services. In a real-world scenario, you should handle shared data models differently by:
 - Creating a separate shared library/JAR for common data models
 - Using schema registries (like Confluent Schema Registry) with Avro or JSON Schema
 - Implementing proper versioning strategies for your data contracts
@@ -25,8 +26,8 @@ Our system consists of several independent microservices that communicate throug
 ┌─────────────────────────┐    ┌─────────────────────┐    ┌─────────────────────────┐
 │ workshop-kafka-train    │    │                     │    │    train-locations      │
 │ (TrainLocationSimulator)│───►│       KAFKA         │───►│       (Topic)           │
-│    (Java Producer)      │    │                     │    └─────────────┬───────────┘
-└─────────────────────────┘    └─────────────────────┘                  │
+│    (Java Producer)      │    │                     │    │    (3 Partitions)       │
+└─────────────────────────┘    └─────────────────────┘    └─────────────┬───────────┘
                                                                          │ (Consumes)
                                                                          │
                                ┌─────────────────────────────────────────┼─────────────┐
@@ -38,6 +39,11 @@ Our system consists of several independent microservices that communicate throug
 └────────────────────────────────────────────────────────┘    │    (Java Streams)      │
                                                                └─────────────┬───────────┘
                                                                              │ (Produces)
+                                ┌─────────────────────────┐                  │
+                                │ dashboard-consumer      │◄─────────────────┘ (Also Consumes)
+                                │   (Java Consumer)       │                  │
+                                │  (Scalable Service)     │                  │
+                                └─────────────────────────┘                  │
                                                                              │
 ┌─────────────────────┐    ┌─────────────────────────┐                     ▼
 │                     │    │  train-speed-averages   │◄────────────────────┘
@@ -48,6 +54,7 @@ Our system consists of several independent microservices that communicate throug
 ┌────────────────────────────────────────┼─────────────────────────────────────┐
 │              YOUR WEB BROWSER          │                                     │
 │      (http://localhost:8085/index.html)│◄──────(WebSocket)──────────────────┐│
+│       + Kafka UI (localhost:8099)      │                                     ││
 └────────────────────────────────────────┼─────────────────────────────────────┘│
                                          │                                      │
                                          └──────────────────────────────────────┼┘
@@ -84,31 +91,31 @@ Navigate to the root directory of the workshop (where `docker-compose.yml` is lo
 docker-compose up -d
 ```
 
-This command will download the necessary images and start two containers in the background: zookeeper and kafka. You can check that they are running with `docker ps`.
+This command will download the necessary images and start several containers in the background: zookeeper, kafka, kafka-ui, and automatically creates the required topics. You can check that they are running with `docker ps`.
 
-### Step 2. Create the Kafka Topics
+**Kafka UI Dashboard**
+Once the containers are running, you can access the Kafka UI web interface at:
+```
+http://localhost:8099
+```
+This provides a visual interface to monitor topics, partitions, consumer groups, and messages in real-time!
 
-Our services need two topics to communicate:
-- `train-locations`: For raw position data from the trains.
-- `train-speed-averages`: For the processed average speed results.
+### Step 2. Verify Topics Creation
 
-Execute the following commands from your terminal to create them. These commands run a tool inside the kafka Docker container.
+The topics are now created automatically when you run `docker-compose up`. You can verify they were created successfully using these commands:
 
 ```bash
-# Create the topic for raw train locations with 3 partitions
-docker exec kafka kafka-topics --create \
-  --topic train-locations \
-  --bootstrap-server localhost:9092 \
-  --partitions 3 \
-  --replication-factor 1
+# List all topics
+docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list
 
-# Create the topic for our analysis results
-docker exec kafka kafka-topics --create \
-  --topic train-speed-averages \
-  --bootstrap-server localhost:9092 \
-  --partitions 1 \
-  --replication-factor 1
+# Get detailed information about the train-locations topic
+docker exec kafka kafka-topics --describe --topic train-locations --bootstrap-server localhost:9092
+
+# Get detailed information about the train-speed-averages topic  
+docker exec kafka kafka-topics --describe --topic train-speed-averages --bootstrap-server localhost:9092
 ```
+
+You should see that `train-locations` has 3 partitions and `train-speed-averages` has 1 partition.
 
 Your Kafka environment is now ready!
 
@@ -210,17 +217,130 @@ This Python script demonstrates language interoperability and the power of consu
    python maintenance_alerter.py
    ```
 
-
 Now, watch this terminal. Whenever the simulator generates a position with `speedKph < 60`, a `[MAINTENANCE ALERT]` will appear here, while the other services continue their work unaffected.
+
+## Testing Kafka Partition Rebalancing
+
+### Service 5: The Dashboard Consumer (Demonstrates Partition Rebalancing)
+
+This service is now included in the Docker Compose setup and demonstrates one of Kafka's most powerful features: **automatic partition rebalancing**. 
+
+The `dashboard-consumer` service listens to the `train-locations` topic (which has 3 partitions) and logs which partition each message comes from. This is perfect for demonstrating how Kafka distributes work across multiple consumer instances.
+
+### Testing Partition Rebalancing
+
+**🎯 Key Concept:** When you have multiple consumers in the same consumer group, Kafka automatically distributes the topic partitions among them. When consumers join or leave the group, Kafka triggers a "rebalance" to redistribute the partitions fairly.
+
+**To test this:**
+
+1. **Start with a single consumer instance:**
+   ```bash
+   docker-compose up -d
+   ```
+   
+   Watch the logs of the dashboard consumer:
+   ```bash
+   docker-compose logs -f dashboard-consumer
+   ```
+   
+   You'll see it consuming from all 3 partitions (0, 1, and 2).
+
+2. **Scale up to 3 consumer instances:**
+   ```bash
+   docker-compose up --build -d --scale dashboard-consumer=3
+   ```
+   
+   Watch the logs:
+   ```bash
+   docker-compose logs -f dashboard-consumer
+   ```
+   
+   **What you'll observe:**
+   - Kafka triggers a rebalance
+   - Each consumer instance now gets assigned to exactly 1 partition
+   - The workload is now distributed across 3 consumer instances
+   - Each message is processed by only one consumer (no duplicates)
+
+3. **Scale down to 2 consumer instances:**
+   ```bash
+   docker-compose up -d --scale dashboard-consumer=2
+   ```
+   
+   **What you'll observe:**
+   - Another rebalance occurs
+   - One consumer gets 2 partitions, the other gets 1 partition
+   - Messages continue to be processed without loss
+
+4. **Scale back to 1 consumer:**
+   ```bash
+   docker-compose up -d --scale dashboard-consumer=1
+   ```
+   
+   The single remaining consumer takes over all 3 partitions again.
+
+5. **Scale up to 4 consumers:**
+   You know the steps. We will leave this discovery to you! 😉
+
+### Monitoring Rebalancing with Kafka UI
+
+You can visually monitor the rebalancing process using the Kafka UI at `http://localhost:8099`:
+
+1. Go to **Consumer Groups** → **dashboard-group**
+2. Watch the **Partition Assignment** change as you scale consumers up and down
+3. Monitor the **Lag** and **Offset** information for each partition
+
+### Understanding the Logs
+
+In the dashboard consumer logs, you'll see messages like:
+```
+[Partition 0] Received position for train key T-123: Speed 75 kph
+[Partition 1] Received position for train key T-456: Speed 82 kph
+[Partition 2] Received position for train key T-789: Speed 91 kph
+```
+
+The `[Partition X]` prefix shows which partition the message came from, helping you understand the distribution of work.
 
 ## Summary: Running The Full System
 
-You should now have 4 terminal windows running your microservices, plus your web browser showing the live dashboard. This completes the full, end-to-end data pipeline.
+You should now have multiple services running:
+- Kafka infrastructure (Docker containers)
+- Train location simulator (Java producer)
+- Stream processor for speed analysis (Kafka Streams)
+- WebSocket dashboard (Java consumer + web server)
+- Python maintenance alerter (Python consumer)
+- Dashboard consumer service (demonstrating rebalancing)
+
+Plus monitoring tools:
+- Kafka UI web interface at `http://localhost:8099`
+- Live train dashboard at `http://localhost:8085/index.html`
+
+## Useful Commands for Monitoring
+
+```bash
+# List all topics
+docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list
+
+# Describe a specific topic
+docker exec kafka kafka-topics --describe --topic train-locations --bootstrap-server localhost:9092
+
+# List consumer groups
+docker exec kafka kafka-consumer-groups --bootstrap-server localhost:9092 --list
+
+# Describe a consumer group
+docker exec kafka kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group dashboard-group
+
+# View container logs
+docker-compose logs -f dashboard-consumer
+docker-compose logs -f kafka
+
+# Scale services
+docker-compose up -d --scale dashboard-consumer=3
+```
 
 ## Shutting Down
 
-- To stop each microservice, go to its terminal window and press `Ctrl + C`.
-- To stop the Kafka and Zookeeper containers, run the following command from the root directory:
+- To stop each non-Docker microservice, go to its terminal window and press `Ctrl + C`.
+- To stop all Docker containers, run the following command from the root directory:
   ```bash
   docker-compose down
   ```
@@ -268,6 +388,11 @@ If you get an error like "L'esecuzione di script è disabilitata nel sistema in 
    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
 
+**Issues with scaling dashboard consumers:**
+
+- Make sure you're running the `docker-compose up --scale` command from the root directory where the `docker-compose.yml` file is located.
+- If containers fail to start due to port conflicts, check the dashboard consumer service configuration - it should not expose any specific ports since it's only a consumer.
+
 ---
 
 ## Workshop Architecture Notes
@@ -283,3 +408,15 @@ For real-world applications, consider:
 - Implementing a multi-module project structure
 - Using schema registries for better data contract management
 - Implementing proper versioning strategies for your shared models
+
+## Key Learning Outcomes
+
+After completing this workshop, participants will understand:
+
+1. **Kafka Fundamentals:** Topics, partitions, producers, and consumers
+2. **Consumer Groups:** How multiple consumers can share workload automatically
+3. **Partition Rebalancing:** Kafka's automatic load balancing when consumers join/leave
+4. **Language Interoperability:** Java and Python services working together through Kafka
+5. **Stream Processing:** Real-time data transformation with Kafka Streams
+6. **Monitoring:** Using both command-line tools and web interfaces to monitor Kafka clusters
+7. **Scalability:** How to scale consumer applications horizontally
