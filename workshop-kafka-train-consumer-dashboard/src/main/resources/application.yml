@@ -5,7 +5,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: dashboard-group # <<< IMPORTANT
+      group-id: dashboard-group # <<< IMPORTANT. It must be the same for all consumers in the same group.
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer

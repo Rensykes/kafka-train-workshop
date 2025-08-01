@@ -1,5 +1,4 @@
-# docker-compose.yml
-version: '3'
+version: '3.7'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -22,3 +21,36 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.3.2
+    depends_on:
+      - kafka
+    entrypoint: [ "sh", "-c",
+      "
+      echo 'Waiting for Kafka to be ready...';
+      cub kafka-ready -b kafka:29092 1 20 && \
+      kafka-topics --create --topic train-locations --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 && \
+      kafka-topics --create --topic train-speed-averages --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+      "
+    ]
+
+  dashboard-consumer:
+    build:
+      context: ./workshop-kafka-train-consumer-dashboard
+    depends_on:
+      - kafka-init
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8099:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./kafka-ui-config/config.yml:/etc/kafkaui/dynamic_config.yaml
