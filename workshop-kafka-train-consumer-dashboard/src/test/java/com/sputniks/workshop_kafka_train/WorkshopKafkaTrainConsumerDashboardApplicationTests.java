@@ -1,4 +1,4 @@
-package com.sputniks.workshop_kafka_train_consumer_dashboard;
+package com.sputniks.workshop_kafka_train;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
