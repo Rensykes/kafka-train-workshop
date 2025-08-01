@@ -1,0 +1,54 @@
+<!-- src/main/resources/static/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Train Control Center - Live Speed</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; }
+        #dashboard { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; }
+        .train-card {
+            background: white; border: 1px solid #ddd; border-radius: 8px;
+            padding: 15px; width: 250px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .train-id { font-weight: bold; font-size: 1.2em; color: #333; }
+        .train-speed { font-size: 2em; color: #007bff; text-align: center; margin-top: 10px; }
+        .speed-unit { font-size: 0.7em; color: #666; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h1>Train Control Center - Live Average Speed</h1>
+    <div id="dashboard"></div>
+
+    <script>
+        const dashboard = document.getElementById('dashboard');
+
+        function updateTrainDisplay(data) {
+            let card = document.getElementById(`train-${data.trainId}`);
+            if (!card) {
+                card = document.createElement('div');
+                card.id = `train-${data.trainId}`;
+                card.className = 'train-card';
+                dashboard.appendChild(card);
+            }
+            card.innerHTML = `
+                <div class="train-id">${data.trainId}</div>
+                <div class="train-speed">${data.averageSpeed.toFixed(1)} <span class="speed-unit">km/h</span></div>
+                <small>Updated: ${new Date().toLocaleTimeString()}</small>
+            `;
+        }
+
+        const socket = new SockJS('/ws-dashboard');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/speed-updates', function (message) {
+                const speedUpdate = JSON.parse(message.body);
+                updateTrainDisplay(speedUpdate);
+            });
+        });
+    </script>
+</body>
+</html>

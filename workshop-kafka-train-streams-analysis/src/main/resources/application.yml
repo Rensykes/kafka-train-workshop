@@ -1,0 +1,10 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    streams:
+      # 'application-id' is for Streams. The equivalent for a consumer is 'group-id'.
+      application-id: speed-analysis-stream-app # Important!
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+        spring.json.trusted.packages: "com.sputniks.workshop_kafka_train"
