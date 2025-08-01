@@ -25,16 +25,29 @@ public class LocationProducerService {
     private KafkaTemplate<String, TrainPosition> kafkaTemplate;
 
     @Scheduled(fixedRate = 2000)
-    public void sendTrainPosition() {
-        String trainId = TRAINS[random.nextInt(TRAINS.length)];
+    public void scheduleSendTrainPosition() {
+        sendRandomTrainPosition();
+    }
 
+    /**
+     * public method to send a random train position.
+     * Can be used for testing or manual invocation.
+     */
+    public void sendRandomTrainPosition() {
+        String trainId = TRAINS[random.nextInt(TRAINS.length)];
         TrainPosition position = new TrainPosition(
             trainId,
             48.85 + random.nextDouble() * 0.1,
             2.35 + random.nextDouble() * 0.1,
             random.nextInt(120) + 30
         );
+        send(position);
+    }
 
+    /**
+     *  A specific send method for even more targeted testing
+     */
+    public void send(TrainPosition position) {
         // * Send the message. The trainId is used as the message key.
         // * Kafka guarantees that all messages with the same key go to the same partition.
         // * This is crucial for ordering events for a specific train.
