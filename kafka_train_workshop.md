@@ -79,6 +79,19 @@ Before you begin, please ensure you have the following software installed on you
 
 ---
 
+## 🐳 Docker Compose Options
+This workshop can be started entirely using `docker-compose up -d`, which will launch all services including the Kafka broker, topic initialization, and all microservices. For more flexible deployment options:
+
+### Start just Kafka infrastructure:
+`docker-compose -f .\docker-compose-kafka.yml up -d`
+This launches only Zookeeper, Kafka broker, and Kafka UI, allowing you to run the applications manually as explained in the workshop instructions.
+
+### Start consumer services with scaling:
+`docker-compose -f .\docker-compose-consumer.yml up -d --scale dashboard-consumer=3`
+This starts the consumer services (including the scalable dashboard consumer) which you can then scale up or down to demonstrate partition rebalancing. The number of consumer instances can be adjusted by changing the --scale parameter.
+
+The full `docker-compose.yml` combines all these services for a complete one-command startup of the entire workshop environment.
+
 ## 🎯 Part 1: Setting Up The Environment
 
 This part is the foundation for everything. We will start the Kafka infrastructure and create the "channels" (topics) for our services to communicate.

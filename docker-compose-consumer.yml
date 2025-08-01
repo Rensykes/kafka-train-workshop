@@ -56,6 +56,17 @@ services:
       options:
         tag: "{{.Name}}"
 
+  producer:
+    build:
+      context: ./workshop-kafka-train-producer
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+        
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
