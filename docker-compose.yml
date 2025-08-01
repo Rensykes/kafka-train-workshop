@@ -1,4 +1,5 @@
-version: '3.7'
+# Removed the obsolete 'version' tag
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -21,17 +22,26 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   kafka-init:
     image: confluentinc/cp-kafka:7.3.2
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     entrypoint: [ "sh", "-c",
       "
-      echo 'Waiting for Kafka to be ready...';
-      cub kafka-ready -b kafka:29092 1 20 && \
-      kafka-topics --create --topic train-locations --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 && \
-      kafka-topics --create --topic train-speed-averages --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1
+      echo 'Kafka is healthy! Creating topics...';
+      kafka-topics --create --if-not-exists --topic train-locations --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 && \
+      kafka-topics --create --if-not-exists --topic train-speed-averages --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 && \
+      echo 'Topics created successfully.'
       "
     ]
 
@@ -39,7 +49,10 @@ services:
     build:
       context: ./workshop-kafka-train-consumer-dashboard
     depends_on:
-      - kafka-init
+      kafka-init:
+        condition: service_completed_successfully
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     logging:
       driver: "json-file"
       options:
@@ -50,6 +63,9 @@ services:
     image: provectuslabs/kafka-ui:latest
     ports:
       - 8099:8080
+    depends_on:
+      kafka:
+        condition: service_healthy
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
     volumes:
