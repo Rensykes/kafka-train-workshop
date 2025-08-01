@@ -1,0 +1,12 @@
+{
+  "namespace": "com.sputniks.workshop_kafka_train.avro",
+  "type": "record",
+  "name": "TrainPosition",
+  "fields": [
+    { "name": "trainId", "type": "string" },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "speedKph", "type": "int" },
+    { "name": "engineTemperature", "type": "double", "default": 90.0 }
+  ]
+}

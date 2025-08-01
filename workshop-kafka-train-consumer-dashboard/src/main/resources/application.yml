@@ -8,7 +8,10 @@ spring:
       group-id: dashboard-group # <<< IMPORTANT. It must be the same for all consumers in the same group.
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      # Use the Avro Deserializer for the value
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
-        spring.json.trusted.packages: "com.sputniks.workshop_kafka_train"
-        spring.json.value.default.type: com.sputniks.workshop_kafka_train.TrainPosition
+        # Point it to the Schema Registry
+        schema.registry.url: http://localhost:8081
+        # For deserializing specific Avro records
+        specific.avro.reader: true

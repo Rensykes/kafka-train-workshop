@@ -6,6 +6,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import com.sputniks.workshop_kafka_train.avro.TrainPosition;
 
 @Component
 public class DashboardListener {
@@ -23,8 +24,8 @@ public class DashboardListener {
 
         log.info("[Partition {}] Received position for train key {}: Speed {} kph",
                 partition,
-                key,
-                position.speedKph()
+                position.getTrainId(),
+                position.getSpeedKph()
         );
     }
 }
