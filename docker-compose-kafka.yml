@@ -43,65 +43,6 @@ services:
       "
     ]
 
-  dashboard-consumer:
-    build:
-      context: ./workshop-kafka-train-consumer-dashboard
-    depends_on:
-      kafka-init:
-        condition: service_completed_successfully
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}"
-
-  producer:
-    build:
-      context: ./workshop-kafka-train-producer
-    depends_on:
-      kafka-init:
-        condition: service_completed_successfully
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}"
-
-  streams-analysis:
-    build:
-      context: ./workshop-kafka-train-streams-analysis
-    depends_on:
-      kafka-init:
-        condition: service_completed_successfully
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}"
-
-  websocket:
-    ports:
-    - 8085:8085
-    build:
-      context: ./workshop-kafka-train-websocket
-    depends_on:
-      kafka-init:
-        condition: service_completed_successfully
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}"
-
-  maintenance_alerter:
-    build:
-      context: ./kafka-workshop-train-python-service
-    depends_on:
-      kafka-init:
-        condition: service_completed_successfully
-    environment:
-      BOOTSTRAP_SERVERS: kafka:29092
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}"
-
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
