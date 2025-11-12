@@ -8,3 +8,8 @@ spring:
         default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
         default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
         spring.json.trusted.packages: "com.sputniks.workshop_kafka_train"
+        # Reduce internal buffering and commit more frequently so aggregated
+        # results are forwarded to the output topic promptly during the demo.
+        # WARNING: disabling cache and frequent commits increase CPU and I/O.
+        commit.interval.ms: 1000
+        cache.max.bytes.buffering: 0

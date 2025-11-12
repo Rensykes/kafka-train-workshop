@@ -22,50 +22,8 @@ This project demonstrates core Kafka concepts like:
 
 Our system consists of several independent microservices that communicate through Kafka:
 
-```
-┌─────────────────────────┐    ┌─────────────────────┐    ┌─────────────────────────┐
-│ workshop-kafka-train    │    │                     │    │    train-locations      │
-│ (TrainLocationSimulator)│───►│       KAFKA         │───►│       (Topic)           │
-│    (Java Producer)      │    │                     │    │    (3 Partitions)       │
-└─────────────────────────┘    └─────────────────────┘    └─────────────┬───────────┘
-                                                                         │ (Consumes)
-                                                                         │
-                               ┌─────────────────────────────────────────┼─────────────┐
-                               │                                         │             │
-                               │                                         ▼             │
-┌──────────────────────────────┴─────────────────────────┐    ┌─────────────────────────┐
-│        kafka-workshop-train-python                     │    │ workshop-kafka-train-   │
-│         (Maintenance Alerter)                          │    │    streams-analysis     │
-└────────────────────────────────────────────────────────┘    │    (Java Streams)      │
-                                                               └─────────────┬───────────┘
-                                                                             │ (Produces)
-                                ┌─────────────────────────┐                  │
-                                │ dashboard-consumer      │◄─────────────────┘ (Also Consumes)
-                                │   (Java Consumer)       │                  │
-                                │  (Scalable Service)     │                  │
-                                └─────────────────────────┘                  │
-                                                                             │
-┌─────────────────────┐    ┌─────────────────────────┐                     ▼
-│                     │    │  train-speed-averages   │◄────────────────────┘
-│       KAFKA         │───►│       (Topic)           │
-│                     │    └─────────────┬───────────┘
-└─────────────────────┘                  │ (Consumes)
-                                         │
-┌────────────────────────────────────────┼─────────────────────────────────────┐
-│              YOUR WEB BROWSER          │                                     │
-│      (http://localhost:8085/index.html)│◄──────(WebSocket)──────────────────┐│
-│       + Kafka UI (localhost:8099)      │                                     ││
-└────────────────────────────────────────┼─────────────────────────────────────┘│
-                                         │                                      │
-                                         └──────────────────────────────────────┼┘
-                                                                                │
-                                         ┌─────────────────────────────────────┼┐
-                                         │   workshop-kafka-train-websocket    ││
-                                         │   (Java Consumer + Web Server)      ││
-                                         └─────────────────────────────────────┼┘
-                                                                               │
-                                         ┌─────────────────────────────────────┘
-```
+![Light mode](assets/img/diagram-light.drawio.png)
+![Dark mode](assets/img/diagram-dark.drawio.png)
 
 ## 📋 Prerequisites
 
@@ -87,7 +45,11 @@ This workshop can be started entirely using `docker-compose up -d`, which will l
 This launches only Zookeeper, Kafka broker, and Kafka UI, allowing you to run the applications manually as explained in the workshop instructions.
 
 ### Start consumer services with scaling:
-`docker-compose -f .\docker-compose-consumer.yml up -d --scale dashboard-consumer=3`
+```bash
+docker-compose -f .\docker-compose-consumer.yml up -d --scale dashboard-consumer=3 # This will trigger the recreation of all the containers
+docker-compose up -d --scale dashboard-consumer=3 dashboard-consumer # This will trigger the recreation of only the containers that we want to scale
+```
+
 This starts the consumer services (including the scalable dashboard consumer) which you can then scale up or down to demonstrate partition rebalancing. The number of consumer instances can be adjusted by changing the --scale parameter.
 
 The full `docker-compose.yml` combines all these services for a complete one-command startup of the entire workshop environment.
@@ -344,7 +306,9 @@ docker-compose logs -f dashboard-consumer
 docker-compose logs -f kafka
 
 # Scale services
-docker-compose up -d --scale dashboard-consumer=3
+docker-compose up -d --scale dashboard-consumer=3 # This will trigger the recreation of all the containers
+docker-compose up -d --scale dashboard-consumer=3 dashboard-consumer # This will trigger the recreation of only the containers that we want to scale
+
 ```
 
 ## 🛑 Shutting Down

@@ -24,7 +24,7 @@ public class LocationProducerService {
     @Autowired
     private KafkaTemplate<String, TrainPosition> kafkaTemplate;
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 100)
     public void sendTrainPosition() {
         String trainId = TRAINS[random.nextInt(TRAINS.length)];
 

@@ -63,11 +63,11 @@ public class StreamProcessor {
          *     - .add(value.speedKph()): adds the speed to the accumulator.
          *     - Materialized.with(...): stores state in memory (backed by RocksDB or in-memory store).
          * - mapValues(...): once the aggregation is done, compute the average from the accumulator.
-         * At this point, you have a KTable<Windowed<String>, Double> containing average speeds per train ID every 10 seconds.
+         * At this point, you have a KTable<Windowed<String>, Double> containing average speeds per train ID every 2 seconds.
         */
         KTable<Windowed<String>, Double> averageSpeedTable = inputStream
             .groupByKey(Grouped.with(Serdes.String(), positionSerde))
-            .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(10)))
+            .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(2)))
             .aggregate(
                 AverageAggregator::new,
                 (key, value, aggregate) -> aggregate.add(value.speedKph()),
