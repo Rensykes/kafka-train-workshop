@@ -22,8 +22,8 @@ This project demonstrates core Kafka concepts like:
 
 Our system consists of several independent microservices that communicate through Kafka:
 
-![Light mode](assets/img/diagram-light.drawio.png)
-![Dark mode](assets/img/diagram-dark.drawio.png)
+![Light mode](assets/img/diagram-light.drawio.png#gh-light-mode-only)
+![Dark mode](assets/img/diagram-dark.drawio.png#gh-dark-mode-only)
 
 ## 📋 Prerequisites
 
