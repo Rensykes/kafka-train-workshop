@@ -9,7 +9,5 @@
     
     WORKDIR /app
         COPY --from=build /build/target/*.jar app.jar
-    
-    COPY --chmod=755 entrypoint.sh .
-    
-    ENTRYPOINT ["./entrypoint.sh"]
+
+    ENTRYPOINT ["java", "-jar", "/app/app.jar", "--spring.kafka.bootstrap-servers=kafka:29092"]
