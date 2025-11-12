@@ -39,7 +39,7 @@
         <mxCell id="wRIRe9PWw1mXIGYgKGhq-10" value="" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;fillColor=#FF6A00;strokeColor=none;shape=mxgraph.alibaba_cloud.kafka;" vertex="1" parent="1">
           <mxGeometry x="463.4" y="40" width="43.2" height="32" as="geometry" />
         </mxCell>
-        <mxCell id="wRIRe9PWw1mXIGYgKGhq-15" value="&lt;p&gt;kafka-workshop-train-python&lt;/p&gt;&lt;p&gt;(MaintenanceAlerter)&lt;/p&gt;&lt;p&gt;CONSUMER&lt;/p&gt;" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+        <mxCell id="wRIRe9PWw1mXIGYgKGhq-15" value="&lt;p&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;workshop-kafka-train-python-service&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;(MaintenanceAlerter)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;CONSUMER&lt;/p&gt;" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="170" y="260" width="280" height="100" as="geometry" />
         </mxCell>
         <mxCell id="wRIRe9PWw1mXIGYgKGhq-25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wRIRe9PWw1mXIGYgKGhq-20" target="wRIRe9PWw1mXIGYgKGhq-24">

@@ -158,7 +158,7 @@ This is the DashboardWebApp. This service has two roles:
 
 After a few seconds (waiting for the first 10-second window to complete), you should see train cards appear and their average speed updating in real-time on the webpage! 🎉
 
-### 🐍 Service 4: The Python Alerter (kafka-workshop-train-python-service)
+### 🐍 Service 4: The Python Alerter (workshop-kafka-train-python-service)
 
 This Python script demonstrates language interoperability and the power of consumer groups. It listens to the same `train-locations` topic as our Streams application, but for a different purpose: to alert if a train is slowing down (speed is lesser than 60). It uses a different group-id, so it gets a full, independent copy of all messages.
 
@@ -167,7 +167,7 @@ This Python script demonstrates language interoperability and the power of consu
 1. Open a new terminal.
 2. Navigate to the project directory:
    ```bash
-   cd kafka-workshop-train-python-service
+   cd workshop-kafka-train-python-service
    ```
 3. Create and activate a Python virtual environment:
    ```bash
