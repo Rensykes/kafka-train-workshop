@@ -439,6 +439,47 @@ curl http://localhost:8081/subjects/train-locations-avro-value/versions/1 | jq
 
 You can also view schemas in Kafka UI at `http://localhost:8099` under the "Schema Registry" tab.
 
+### 🧰 Schema Registry: Testing & Management (scripts)
+
+There are two helper scripts included for convenience:
+
+- `assets/schema-registry-demo-scripts/schema-registry-commands.ps1` (PowerShell)
+- `assets/schema-registry-demo-scripts/schema-registry-commands.sh` (POSIX shell, requires `jq`)
+
+They provide quick commands to list subjects, inspect versions, parse the latest Avro schema, check/set compatibility, test candidate schemas for compatibility, register a new schema version, get a schema by id, and (commented) delete a subject.
+
+Quick PowerShell examples (Windows):
+
+```powershell
+# List subjects
+curl.exe http://localhost:8081/subjects | ConvertFrom-Json
+
+# Get latest train-locations schema (parsed)
+($s = curl.exe http://localhost:8081/subjects/train-locations-avro-value/versions/latest | ConvertFrom-Json).schema | ConvertFrom-Json
+
+# Test compatibility of a candidate schema (POST)
+curl.exe -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"schema":"<AVRO_JSON_AS_STRING>"}' http://localhost:8081/compatibility/subjects/train-locations-avro-value/versions/latest
+```
+
+Quick macOS / Linux examples:
+
+```bash
+# List subjects (requires jq)
+curl -s http://localhost:8081/subjects | jq
+
+# Get latest train-locations schema (parsed)
+curl -s http://localhost:8081/subjects/train-locations-avro-value/versions/latest | jq '.schema | fromjson'
+
+# Test compatibility of a candidate schema (POST)
+curl -s -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"schema":"<AVRO_JSON_AS_STRING>"}' http://localhost:8081/compatibility/subjects/train-locations-avro-value/versions/latest | jq
+```
+
+Notes:
+
+- On Windows PowerShell, `curl` may be an alias for `Invoke-WebRequest`; use `curl.exe` to call the real curl binary.
+- The shell script uses `jq` to pretty-print JSON; install `jq` if you don't already have it.
+
+
 ### 💡 Key Resilience Features Demonstrated
 
 | Feature | How It Helps | Example in Workshop |
