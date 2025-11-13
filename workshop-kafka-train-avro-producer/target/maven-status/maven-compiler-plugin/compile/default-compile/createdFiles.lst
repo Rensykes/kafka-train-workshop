@@ -1,9 +1,0 @@
-com\sputniks\workshop_kafka_train\avro\TrainPosition.class
-com\sputniks\workshop_kafka_train\avro\TrainPosition$Builder.class
-com\sputniks\workshop_kafka_train\avro\KafkaProducerConfig.class
-com\sputniks\workshop_kafka_train\avro\AvroProducerService.class
-com\sputniks\workshop_kafka_train\avro\AlertType.class
-com\sputniks\workshop_kafka_train\avro\AvroProducerApplication.class
-com\sputniks\workshop_kafka_train\avro\Severity.class
-com\sputniks\workshop_kafka_train\avro\TrainAlert.class
-com\sputniks\workshop_kafka_train\avro\TrainAlert$Builder.class
