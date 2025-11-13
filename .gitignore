@@ -3,3 +3,21 @@ kafka-workshop/
 
 # VsCode
 .vscode/
+
+# Maven / Java build artifacts
+# ignore module build output
+**/target/
+
+# Common jar artifacts
+*.jar
+
+# Generated sources (Avro/Protobuf/Thrift) and maven-generated code
+**/generated-sources/
+**/generated-test-sources/
+
+# Maven wrapper jar (already in some module ignores but keep here)
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ
+.idea/
+
