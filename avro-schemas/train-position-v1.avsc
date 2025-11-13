@@ -1,0 +1,28 @@
+{
+  "namespace": "com.sputniks.workshop_kafka_train.avro",
+  "type": "record",
+  "name": "TrainPosition",
+  "doc": "Version 1: Initial schema for train position data",
+  "fields": [
+    {
+      "name": "trainId",
+      "type": "string",
+      "doc": "Unique identifier for the train"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "doc": "GPS latitude coordinate"
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "GPS longitude coordinate"
+    },
+    {
+      "name": "speedKph",
+      "type": "int",
+      "doc": "Speed in kilometers per hour"
+    }
+  ]
+}
