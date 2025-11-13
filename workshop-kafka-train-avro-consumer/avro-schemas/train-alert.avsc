@@ -1,0 +1,55 @@
+{
+  "namespace": "com.sputniks.workshop_kafka_train.avro",
+  "type": "record",
+  "name": "TrainAlert",
+  "doc": "Alert message for train maintenance or issues",
+  "fields": [
+    {
+      "name": "alertId",
+      "type": "string",
+      "doc": "Unique identifier for this alert"
+    },
+    {
+      "name": "trainId",
+      "type": "string",
+      "doc": "Train that triggered the alert"
+    },
+    {
+      "name": "alertType",
+      "type": {
+        "type": "enum",
+        "name": "AlertType",
+        "symbols": ["MAINTENANCE", "SPEED_VIOLATION", "LOW_FUEL", "POSITION_ERROR"]
+      },
+      "doc": "Type of alert"
+    },
+    {
+      "name": "severity",
+      "type": {
+        "type": "enum",
+        "name": "Severity",
+        "symbols": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+      },
+      "doc": "Severity level of the alert"
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "doc": "Human-readable alert message"
+    },
+    {
+      "name": "timestamp",
+      "type": "long",
+      "doc": "When the alert was generated (Unix timestamp in milliseconds)"
+    },
+    {
+      "name": "metadata",
+      "type": ["null", {
+        "type": "map",
+        "values": "string"
+      }],
+      "doc": "Additional metadata as key-value pairs",
+      "default": null
+    }
+  ]
+}

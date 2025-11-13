@@ -11,10 +11,11 @@ This project demonstrates core Kafka concepts like:
 - 🌐 Language Interoperability (Java & Python)
 - 🔄 Stateful Stream Processing with Kafka Streams
 - 📊 Real-time data visualization with WebSockets
+- 🛡️ **Schema Registry and Avro for Data Resilience**
 
 **⚠️ Note on Architecture:** For the sake of simplicity in this workshop, we used the same package structure across all Java applications to make the serialized objects (like `TrainPosition`) available across all services. In a real-world scenario, you should handle shared data models differently by:
 - 📦 Creating a separate shared library/JAR for common data models
-- 🗄️ Using schema registries (like Confluent Schema Registry) with Avro or JSON Schema
+- 🗄️ **Using schema registries (like Confluent Schema Registry) with Avro or JSON Schema** ⭐ See Part 3 below!
 - 🔄 Implementing proper versioning strategies for your data contracts
 - 🏗️ Following microservice principles where each service owns its data model
 
@@ -369,18 +370,165 @@ If you get an error like "L'esecuzione di script è disabilitata nel sistema in 
 
 ---
 
+## 🛡️ Part 3: Schema Registry and Avro for Data Resilience
+
+This section demonstrates how Schema Registry and Apache Avro provide production-grade resilience for evolving data schemas without downtime.
+
+### 🎯 What is Schema Registry?
+
+Schema Registry is a centralized service that:
+- Stores and versions your data schemas
+- Validates schema compatibility before registration
+- Ensures producers and consumers can evolve independently
+- Prevents breaking changes from entering your system
+
+### 🔧 Components
+
+When you run `docker-compose up`, the following Schema Registry components are started:
+
+1. **Schema Registry** (port 8081): Central schema repository
+2. **Avro Producer** (`workshop-kafka-train-avro-producer`): Demonstrates schema evolution
+3. **Avro Consumer** (`workshop-kafka-train-avro-consumer`): Handles multiple schema versions
+
+### 🚀 Running the Schema Registry Example
+
+The Avro services are included in the main `docker-compose.yml`:
+
+```bash
+# Start everything including Schema Registry
+docker-compose up -d
+
+# Watch the Avro producer logs (schema evolution happens after 30 seconds)
+docker-compose logs -f avro-producer
+
+# Watch the Avro consumer logs (handles both V1 and V2 schemas)
+docker-compose logs -f avro-consumer
+```
+
+Or run manually for development:
+
+```bash
+# Terminal 1: Start the Avro producer
+cd workshop-kafka-train-avro-producer
+mvn spring-boot:run
+
+# Terminal 2: Start the Avro consumer
+cd workshop-kafka-train-avro-consumer
+mvn spring-boot:run
+```
+
+### 📊 What Happens?
+
+1. **First 30 seconds**: Producer sends data using **V1 schema** (basic fields)
+2. **After 30 seconds**: Producer automatically switches to **V2 schema** (adds timestamp + fuel level)
+3. **Consumer**: Handles both versions seamlessly, no errors, no downtime!
+
+### 🔍 Monitoring Schemas
+
+Check registered schemas:
+```bash
+# List all schema subjects
+curl http://localhost:8081/subjects
+
+# Get schema versions for train positions
+curl http://localhost:8081/subjects/train-locations-avro-value/versions
+
+# View specific schema
+curl http://localhost:8081/subjects/train-locations-avro-value/versions/1 | jq
+```
+
+You can also view schemas in Kafka UI at `http://localhost:8099` under the "Schema Registry" tab.
+
+### 💡 Key Resilience Features Demonstrated
+
+| Feature | How It Helps | Example in Workshop |
+|---------|-------------|---------------------|
+| **Schema Evolution** | Add new fields without breaking consumers | V2 adds `timestamp` and `fuelLevel` |
+| **Backward Compatibility** | New consumers read old data | Consumer handles V1 messages with defaults |
+| **Forward Compatibility** | Old consumers read new data | V1 consumer ignores extra V2 fields |
+| **Type Safety** | Enums prevent invalid values | `AlertType` must be MAINTENANCE, LOW_FUEL, etc. |
+| **Auto-validation** | Bad schemas rejected at registration | Try to register incompatible schema - it fails! |
+| **Self-documentation** | Schema serves as contract | Each field has `doc` explaining its purpose |
+
+### 🧪 Try These Experiments
+
+**Experiment 1: Schema Evolution in Action**
+1. Start producer and consumer
+2. Watch logs for `[V1]` messages
+3. After 30 seconds, see `🔄 SCHEMA EVOLUTION` message
+4. Watch logs for `[V2]` messages with fuel data
+5. Consumer handles both versions without restart!
+
+**Experiment 2: View Schema Versions**
+```bash
+# See how many schema versions exist
+curl http://localhost:8081/subjects/train-locations-avro-value/versions
+
+# Get the latest schema
+curl http://localhost:8081/subjects/train-locations-avro-value/versions/latest
+```
+
+**Experiment 3: Test Compatibility**
+The producer automatically validates compatibility. Try modifying schemas in `avro-schemas/` and restarting - incompatible changes will be rejected!
+
+### 📚 Schema Files
+
+All Avro schemas are in the `avro-schemas/` directory:
+
+- `train-position-v1.avsc` - Initial schema with basic fields
+- `train-position-v2.avsc` - Evolved schema with timestamp and fuel level
+- `train-alert.avsc` - Alert schema with enums for type safety
+
+Each schema includes:
+- Field documentation
+- Type definitions
+- Default values for backward compatibility
+
+### 🎓 Learning Outcomes
+
+After completing this section, you'll understand:
+
+1. **Why Schema Registry is essential** for production Kafka systems
+2. **How Avro enables schema evolution** without breaking changes
+3. **Backward vs Forward compatibility** and when to use each
+4. **Type safety benefits** of strongly-typed schemas vs plain JSON
+5. **Zero-downtime deployments** with schema versioning
+6. **Best practices** for evolving data contracts
+
+### 📖 Detailed Documentation
+
+For a comprehensive guide on resilience patterns, compatibility modes, and best practices, see:
+**[SCHEMA_REGISTRY_RESILIENCE.md](SCHEMA_REGISTRY_RESILIENCE.md)**
+
+This document includes:
+- Detailed resilience explanations
+- Schema evolution strategies
+- Compatibility testing examples
+- Production best practices
+- Troubleshooting guide
+
+---
+
 ## 🏗️ Workshop Architecture Notes
 
 📌 **Recommended Conclusion for Production Systems**
 
 Since you're preparing a **realistic workshop**, the **best solution** for production environments would be:
 
-🔁 **Align packages between producer and consumer** → Put `TrainPosition` in a common module imported by both services.
+🔁 **Use Schema Registry with Avro** (demonstrated in Part 3) → This provides:
+- Automatic schema validation and versioning
+- Zero-downtime schema evolution
+- Type safety and documentation
+- Protection against breaking changes
+
+Alternative approaches:
+- 📦 **Shared library/JAR** → Put `TrainPosition` in a common module imported by both services
+- 🗄️ **JSON Schema** → Similar to Avro but with JSON instead of binary format
 
 For real-world applications, consider:
 - 📦 Creating a shared Maven module with its own `pom.xml`
 - 🏗️ Implementing a multi-module project structure
-- 🗄️ Using schema registries for better data contract management
+- 🗄️ **Using Schema Registry for better data contract management** (see Part 3 above)
 - 🔄 Implementing proper versioning strategies for your shared models
 
 ## 🎯 Key Learning Outcomes
@@ -394,3 +542,20 @@ After completing this workshop, participants will understand:
 5. **⚡ Stream Processing:** Real-time data transformation with Kafka Streams
 6. **📊 Monitoring:** Using both command-line tools and web interfaces to monitor Kafka clusters
 7. **📈 Scalability:** How to scale consumer applications horizontally
+8. **🛡️ Schema Registry & Avro:** Production-grade data resilience and schema evolution
+
+## 🌟 Summary
+
+This workshop demonstrates a complete Kafka ecosystem:
+- ✅ Multiple programming languages (Java & Python)
+- ✅ Real-time stream processing
+- ✅ WebSocket-based visualization
+- ✅ Horizontal scalability with consumer groups
+- ✅ **Schema Registry for production-ready data management**
+- ✅ Docker-based deployment
+
+**Next Steps:**
+- Explore the Schema Registry examples in Part 3
+- Experiment with different schema evolution strategies
+- Try modifying the Avro schemas and see how Schema Registry validates them
+- Read [SCHEMA_REGISTRY_RESILIENCE.md](SCHEMA_REGISTRY_RESILIENCE.md) for advanced patterns

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: workshop-kafka-train-avro-consumer
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: avro-consumer-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      auto-offset-reset: earliest
+      properties:
+        schema.registry.url: http://localhost:8081
+        # Enable SpecificRecord (generated classes) instead of GenericRecord
+        specific.avro.reader: true
+
+logging:
+  level:
+    com.sputniks: INFO
+    org.apache.kafka: WARN

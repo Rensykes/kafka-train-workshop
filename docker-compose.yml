@@ -29,6 +29,19 @@ services:
       retries: 5
       start_period: 20s
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.3.2
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
+      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+
   kafka-init:
     image: confluentinc/cp-kafka:7.3.2
     depends_on:
@@ -39,6 +52,8 @@ services:
       echo 'Kafka is healthy! Creating topics...';
       kafka-topics --create --if-not-exists --topic train-locations --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 && \
       kafka-topics --create --if-not-exists --topic train-speed-averages --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 && \
+      kafka-topics --create --if-not-exists --topic train-locations-avro --bootstrap-server kafka:29092 --partitions 3 --replication-factor 1 && \
+      kafka-topics --create --if-not-exists --topic train-alerts-avro --bootstrap-server kafka:29092 --partitions 1 --replication-factor 1 && \
       echo 'Topics created successfully.'
       "
     ]
@@ -97,6 +112,40 @@ services:
         condition: service_completed_successfully
     environment:
       BOOTSTRAP_SERVERS: kafka:29092
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+
+  avro-producer:
+    build:
+      context: .
+      dockerfile: ./workshop-kafka-train-avro-producer/Dockerfile
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      schema-registry:
+        condition: service_started
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_PRODUCER_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}"
+
+  avro-consumer:
+    build:
+      context: .
+      dockerfile: ./workshop-kafka-train-avro-consumer/Dockerfile
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      schema-registry:
+        condition: service_started
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_CONSUMER_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     logging:
       driver: "json-file"
       options:

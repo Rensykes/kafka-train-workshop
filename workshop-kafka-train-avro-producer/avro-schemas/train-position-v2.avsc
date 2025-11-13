@@ -1,0 +1,40 @@
+{
+  "namespace": "com.sputniks.workshop_kafka_train.avro",
+  "type": "record",
+  "name": "TrainPosition",
+  "doc": "Version 2: Added timestamp and optional fuel level (backward compatible)",
+  "fields": [
+    {
+      "name": "trainId",
+      "type": "string",
+      "doc": "Unique identifier for the train"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "doc": "GPS latitude coordinate"
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "GPS longitude coordinate"
+    },
+    {
+      "name": "speedKph",
+      "type": "int",
+      "doc": "Speed in kilometers per hour"
+    },
+    {
+      "name": "timestamp",
+      "type": "long",
+      "doc": "Unix timestamp in milliseconds",
+      "default": 0
+    },
+    {
+      "name": "fuelLevel",
+      "type": ["null", "int"],
+      "doc": "Fuel level percentage (0-100), optional for backward compatibility",
+      "default": null
+    }
+  ]
+}

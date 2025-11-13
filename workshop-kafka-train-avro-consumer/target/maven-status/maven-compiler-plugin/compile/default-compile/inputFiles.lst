@@ -1,0 +1,7 @@
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\src\main\java\com\sputniks\workshop_kafka_train\avro\AvroConsumerApplication.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\src\main\java\com\sputniks\workshop_kafka_train\avro\AvroConsumerService.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\src\main\java\com\sputniks\workshop_kafka_train\avro\KafkaConsumerConfig.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\target\generated-sources\avro\com\sputniks\workshop_kafka_train\avro\AlertType.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\target\generated-sources\avro\com\sputniks\workshop_kafka_train\avro\Severity.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\target\generated-sources\avro\com\sputniks\workshop_kafka_train\avro\TrainAlert.java
+C:\dev\ws\kafka-train-workshop\workshop-kafka-train-avro-consumer\target\generated-sources\avro\com\sputniks\workshop_kafka_train\avro\TrainPosition.java
