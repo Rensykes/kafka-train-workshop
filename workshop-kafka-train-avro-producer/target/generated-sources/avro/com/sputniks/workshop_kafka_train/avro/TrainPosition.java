@@ -12,13 +12,13 @@ import org.apache.avro.message.BinaryMessageEncoder;
 import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
-/** Version 2: Added timestamp and optional fuel level (backward compatible) */
+/** V3: Add passengerCount (nullable). */
 @org.apache.avro.specific.AvroGenerated
 public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 9005191784431039896L;
+  private static final long serialVersionUID = -119338489308429804L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TrainPosition\",\"namespace\":\"com.sputniks.workshop_kafka_train.avro\",\"doc\":\"Version 2: Added timestamp and optional fuel level (backward compatible)\",\"fields\":[{\"name\":\"trainId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"Unique identifier for the train\"},{\"name\":\"latitude\",\"type\":\"double\",\"doc\":\"GPS latitude coordinate\"},{\"name\":\"longitude\",\"type\":\"double\",\"doc\":\"GPS longitude coordinate\"},{\"name\":\"speedKph\",\"type\":\"int\",\"doc\":\"Speed in kilometers per hour\"},{\"name\":\"timestamp\",\"type\":\"long\",\"doc\":\"Unix timestamp in milliseconds\",\"default\":0},{\"name\":\"fuelLevel\",\"type\":[\"null\",\"int\"],\"doc\":\"Fuel level percentage (0-100), optional for backward compatibility\",\"default\":null}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TrainPosition\",\"namespace\":\"com.sputniks.workshop_kafka_train.avro\",\"doc\":\"V3: Add passengerCount (nullable).\",\"fields\":[{\"name\":\"trainId\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"Unique identifier for the train\"},{\"name\":\"latitude\",\"type\":\"double\"},{\"name\":\"longitude\",\"type\":\"double\"},{\"name\":\"speedKph\",\"type\":\"int\"},{\"name\":\"timestamp\",\"type\":\"long\",\"default\":0},{\"name\":\"fuelLevel\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"passengerCount\",\"type\":[\"null\",\"int\"],\"doc\":\"Optional passenger count\",\"default\":null}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -76,16 +76,13 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /** Unique identifier for the train */
   private java.lang.String trainId;
-  /** GPS latitude coordinate */
   private double latitude;
-  /** GPS longitude coordinate */
   private double longitude;
-  /** Speed in kilometers per hour */
   private int speedKph;
-  /** Unix timestamp in milliseconds */
   private long timestamp;
-  /** Fuel level percentage (0-100), optional for backward compatibility */
   private java.lang.Integer fuelLevel;
+  /** Optional passenger count */
+  private java.lang.Integer passengerCount;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -97,19 +94,21 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
   /**
    * All-args constructor.
    * @param trainId Unique identifier for the train
-   * @param latitude GPS latitude coordinate
-   * @param longitude GPS longitude coordinate
-   * @param speedKph Speed in kilometers per hour
-   * @param timestamp Unix timestamp in milliseconds
-   * @param fuelLevel Fuel level percentage (0-100), optional for backward compatibility
+   * @param latitude The new value for latitude
+   * @param longitude The new value for longitude
+   * @param speedKph The new value for speedKph
+   * @param timestamp The new value for timestamp
+   * @param fuelLevel The new value for fuelLevel
+   * @param passengerCount Optional passenger count
    */
-  public TrainPosition(java.lang.String trainId, java.lang.Double latitude, java.lang.Double longitude, java.lang.Integer speedKph, java.lang.Long timestamp, java.lang.Integer fuelLevel) {
+  public TrainPosition(java.lang.String trainId, java.lang.Double latitude, java.lang.Double longitude, java.lang.Integer speedKph, java.lang.Long timestamp, java.lang.Integer fuelLevel, java.lang.Integer passengerCount) {
     this.trainId = trainId;
     this.latitude = latitude;
     this.longitude = longitude;
     this.speedKph = speedKph;
     this.timestamp = timestamp;
     this.fuelLevel = fuelLevel;
+    this.passengerCount = passengerCount;
   }
 
   @Override
@@ -128,6 +127,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
     case 3: return speedKph;
     case 4: return timestamp;
     case 5: return fuelLevel;
+    case 6: return passengerCount;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -143,6 +143,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
     case 3: speedKph = (java.lang.Integer)value$; break;
     case 4: timestamp = (java.lang.Long)value$; break;
     case 5: fuelLevel = (java.lang.Integer)value$; break;
+    case 6: passengerCount = (java.lang.Integer)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -167,7 +168,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Gets the value of the 'latitude' field.
-   * @return GPS latitude coordinate
+   * @return The value of the 'latitude' field.
    */
   public double getLatitude() {
     return latitude;
@@ -176,7 +177,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Sets the value of the 'latitude' field.
-   * GPS latitude coordinate
    * @param value the value to set.
    */
   public void setLatitude(double value) {
@@ -185,7 +185,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Gets the value of the 'longitude' field.
-   * @return GPS longitude coordinate
+   * @return The value of the 'longitude' field.
    */
   public double getLongitude() {
     return longitude;
@@ -194,7 +194,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Sets the value of the 'longitude' field.
-   * GPS longitude coordinate
    * @param value the value to set.
    */
   public void setLongitude(double value) {
@@ -203,7 +202,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Gets the value of the 'speedKph' field.
-   * @return Speed in kilometers per hour
+   * @return The value of the 'speedKph' field.
    */
   public int getSpeedKph() {
     return speedKph;
@@ -212,7 +211,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Sets the value of the 'speedKph' field.
-   * Speed in kilometers per hour
    * @param value the value to set.
    */
   public void setSpeedKph(int value) {
@@ -221,7 +219,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Gets the value of the 'timestamp' field.
-   * @return Unix timestamp in milliseconds
+   * @return The value of the 'timestamp' field.
    */
   public long getTimestamp() {
     return timestamp;
@@ -230,7 +228,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Sets the value of the 'timestamp' field.
-   * Unix timestamp in milliseconds
    * @param value the value to set.
    */
   public void setTimestamp(long value) {
@@ -239,7 +236,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Gets the value of the 'fuelLevel' field.
-   * @return Fuel level percentage (0-100), optional for backward compatibility
+   * @return The value of the 'fuelLevel' field.
    */
   public java.lang.Integer getFuelLevel() {
     return fuelLevel;
@@ -248,11 +245,28 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
   /**
    * Sets the value of the 'fuelLevel' field.
-   * Fuel level percentage (0-100), optional for backward compatibility
    * @param value the value to set.
    */
   public void setFuelLevel(java.lang.Integer value) {
     this.fuelLevel = value;
+  }
+
+  /**
+   * Gets the value of the 'passengerCount' field.
+   * @return Optional passenger count
+   */
+  public java.lang.Integer getPassengerCount() {
+    return passengerCount;
+  }
+
+
+  /**
+   * Sets the value of the 'passengerCount' field.
+   * Optional passenger count
+   * @param value the value to set.
+   */
+  public void setPassengerCount(java.lang.Integer value) {
+    this.passengerCount = value;
   }
 
   /**
@@ -298,16 +312,13 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /** Unique identifier for the train */
     private java.lang.String trainId;
-    /** GPS latitude coordinate */
     private double latitude;
-    /** GPS longitude coordinate */
     private double longitude;
-    /** Speed in kilometers per hour */
     private int speedKph;
-    /** Unix timestamp in milliseconds */
     private long timestamp;
-    /** Fuel level percentage (0-100), optional for backward compatibility */
     private java.lang.Integer fuelLevel;
+    /** Optional passenger count */
+    private java.lang.Integer passengerCount;
 
     /** Creates a new Builder */
     private Builder() {
@@ -344,6 +355,10 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
         this.fuelLevel = data().deepCopy(fields()[5].schema(), other.fuelLevel);
         fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
+      if (isValidValue(fields()[6], other.passengerCount)) {
+        this.passengerCount = data().deepCopy(fields()[6].schema(), other.passengerCount);
+        fieldSetFlags()[6] = other.fieldSetFlags()[6];
+      }
     }
 
     /**
@@ -375,6 +390,10 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
       if (isValidValue(fields()[5], other.fuelLevel)) {
         this.fuelLevel = data().deepCopy(fields()[5].schema(), other.fuelLevel);
         fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.passengerCount)) {
+        this.passengerCount = data().deepCopy(fields()[6].schema(), other.passengerCount);
+        fieldSetFlags()[6] = true;
       }
     }
 
@@ -424,7 +443,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Gets the value of the 'latitude' field.
-      * GPS latitude coordinate
       * @return The value.
       */
     public double getLatitude() {
@@ -434,7 +452,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Sets the value of the 'latitude' field.
-      * GPS latitude coordinate
       * @param value The value of 'latitude'.
       * @return This builder.
       */
@@ -447,7 +464,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Checks whether the 'latitude' field has been set.
-      * GPS latitude coordinate
       * @return True if the 'latitude' field has been set, false otherwise.
       */
     public boolean hasLatitude() {
@@ -457,7 +473,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Clears the value of the 'latitude' field.
-      * GPS latitude coordinate
       * @return This builder.
       */
     public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearLatitude() {
@@ -467,7 +482,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Gets the value of the 'longitude' field.
-      * GPS longitude coordinate
       * @return The value.
       */
     public double getLongitude() {
@@ -477,7 +491,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Sets the value of the 'longitude' field.
-      * GPS longitude coordinate
       * @param value The value of 'longitude'.
       * @return This builder.
       */
@@ -490,7 +503,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Checks whether the 'longitude' field has been set.
-      * GPS longitude coordinate
       * @return True if the 'longitude' field has been set, false otherwise.
       */
     public boolean hasLongitude() {
@@ -500,7 +512,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Clears the value of the 'longitude' field.
-      * GPS longitude coordinate
       * @return This builder.
       */
     public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearLongitude() {
@@ -510,7 +521,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Gets the value of the 'speedKph' field.
-      * Speed in kilometers per hour
       * @return The value.
       */
     public int getSpeedKph() {
@@ -520,7 +530,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Sets the value of the 'speedKph' field.
-      * Speed in kilometers per hour
       * @param value The value of 'speedKph'.
       * @return This builder.
       */
@@ -533,7 +542,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Checks whether the 'speedKph' field has been set.
-      * Speed in kilometers per hour
       * @return True if the 'speedKph' field has been set, false otherwise.
       */
     public boolean hasSpeedKph() {
@@ -543,7 +551,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Clears the value of the 'speedKph' field.
-      * Speed in kilometers per hour
       * @return This builder.
       */
     public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearSpeedKph() {
@@ -553,7 +560,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Gets the value of the 'timestamp' field.
-      * Unix timestamp in milliseconds
       * @return The value.
       */
     public long getTimestamp() {
@@ -563,7 +569,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Sets the value of the 'timestamp' field.
-      * Unix timestamp in milliseconds
       * @param value The value of 'timestamp'.
       * @return This builder.
       */
@@ -576,7 +581,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Checks whether the 'timestamp' field has been set.
-      * Unix timestamp in milliseconds
       * @return True if the 'timestamp' field has been set, false otherwise.
       */
     public boolean hasTimestamp() {
@@ -586,7 +590,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Clears the value of the 'timestamp' field.
-      * Unix timestamp in milliseconds
       * @return This builder.
       */
     public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearTimestamp() {
@@ -596,7 +599,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Gets the value of the 'fuelLevel' field.
-      * Fuel level percentage (0-100), optional for backward compatibility
       * @return The value.
       */
     public java.lang.Integer getFuelLevel() {
@@ -606,7 +608,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Sets the value of the 'fuelLevel' field.
-      * Fuel level percentage (0-100), optional for backward compatibility
       * @param value The value of 'fuelLevel'.
       * @return This builder.
       */
@@ -619,7 +620,6 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Checks whether the 'fuelLevel' field has been set.
-      * Fuel level percentage (0-100), optional for backward compatibility
       * @return True if the 'fuelLevel' field has been set, false otherwise.
       */
     public boolean hasFuelLevel() {
@@ -629,12 +629,55 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
 
     /**
       * Clears the value of the 'fuelLevel' field.
-      * Fuel level percentage (0-100), optional for backward compatibility
       * @return This builder.
       */
     public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearFuelLevel() {
       fuelLevel = null;
       fieldSetFlags()[5] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'passengerCount' field.
+      * Optional passenger count
+      * @return The value.
+      */
+    public java.lang.Integer getPassengerCount() {
+      return passengerCount;
+    }
+
+
+    /**
+      * Sets the value of the 'passengerCount' field.
+      * Optional passenger count
+      * @param value The value of 'passengerCount'.
+      * @return This builder.
+      */
+    public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder setPassengerCount(java.lang.Integer value) {
+      validate(fields()[6], value);
+      this.passengerCount = value;
+      fieldSetFlags()[6] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'passengerCount' field has been set.
+      * Optional passenger count
+      * @return True if the 'passengerCount' field has been set, false otherwise.
+      */
+    public boolean hasPassengerCount() {
+      return fieldSetFlags()[6];
+    }
+
+
+    /**
+      * Clears the value of the 'passengerCount' field.
+      * Optional passenger count
+      * @return This builder.
+      */
+    public com.sputniks.workshop_kafka_train.avro.TrainPosition.Builder clearPassengerCount() {
+      passengerCount = null;
+      fieldSetFlags()[6] = false;
       return this;
     }
 
@@ -649,6 +692,7 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
         record.speedKph = fieldSetFlags()[3] ? this.speedKph : (java.lang.Integer) defaultValue(fields()[3]);
         record.timestamp = fieldSetFlags()[4] ? this.timestamp : (java.lang.Long) defaultValue(fields()[4]);
         record.fuelLevel = fieldSetFlags()[5] ? this.fuelLevel : (java.lang.Integer) defaultValue(fields()[5]);
+        record.passengerCount = fieldSetFlags()[6] ? this.passengerCount : (java.lang.Integer) defaultValue(fields()[6]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -699,6 +743,14 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
       out.writeInt(this.fuelLevel);
     }
 
+    if (this.passengerCount == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeInt(this.passengerCount);
+    }
+
   }
 
   @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
@@ -723,8 +775,15 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
         this.fuelLevel = in.readInt();
       }
 
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.passengerCount = null;
+      } else {
+        this.passengerCount = in.readInt();
+      }
+
     } else {
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 7; i++) {
         switch (fieldOrder[i].pos()) {
         case 0:
           this.trainId = in.readString();
@@ -752,6 +811,15 @@ public class TrainPosition extends org.apache.avro.specific.SpecificRecordBase i
             this.fuelLevel = null;
           } else {
             this.fuelLevel = in.readInt();
+          }
+          break;
+
+        case 6:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.passengerCount = null;
+          } else {
+            this.passengerCount = in.readInt();
           }
           break;
 

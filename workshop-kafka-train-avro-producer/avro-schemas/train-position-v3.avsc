@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "TrainPosition",
+  "namespace": "com.sputniks.workshop_kafka_train.avro",
+  "doc": "V3: Add passengerCount (nullable).",
+  "fields": [
+    { "name": "trainId", "type": "string", "doc": "Unique identifier for the train" },
+    { "name": "latitude", "type": "double" },
+    { "name": "longitude", "type": "double" },
+    { "name": "speedKph", "type": "int" },
+    { "name": "timestamp", "type": "long", "default": 0 },
+    { "name": "fuelLevel", "type": ["null", "int"], "default": null },
+    { "name": "passengerCount", "type": ["null", "int"], "default": null, "doc": "Optional passenger count" }
+  ]
+}
