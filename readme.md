@@ -11,13 +11,16 @@ This project demonstrates core Kafka concepts like:
 - 🌐 Language Interoperability (Java & Python)
 - 🔄 Stateful Stream Processing with Kafka Streams
 - 📊 Real-time data visualization with WebSockets
-- 🛡️ **Schema Registry and Avro for Data Resilience**
+- 🛡️ Schema Registry and Avro for Data Resilience
 
 **⚠️ Note on Architecture:** For the sake of simplicity in this workshop, we used the same package structure across all Java applications to make the serialized objects (like `TrainPosition`) available across all services. In a real-world scenario, you should handle shared data models differently by:
 - 📦 Creating a separate shared library/JAR for common data models
 - 🗄️ **Using schema registries (like Confluent Schema Registry) with Avro or JSON Schema** ⭐ See Part 3 below!
 - 🔄 Implementing proper versioning strategies for your data contracts
 - 🏗️ Following microservice principles where each service owns its data model
+
+## 📖 Workshop material
+You can find the slides and pdf files of the presentation <a href="assets/slides">here</a>
 
 ## 🏗️ System Architecture
 
@@ -535,20 +538,6 @@ After completing this section, you'll understand:
 4. **Type safety benefits** of strongly-typed schemas vs plain JSON
 5. **Zero-downtime deployments** with schema versioning
 6. **Best practices** for evolving data contracts
-
-### 📖 Detailed Documentation
-
-For a comprehensive guide on resilience patterns, compatibility modes, and best practices, see:
-**[SCHEMA_REGISTRY_RESILIENCE.md](SCHEMA_REGISTRY_RESILIENCE.md)**
-
-This document includes:
-- Detailed resilience explanations
-- Schema evolution strategies
-- Compatibility testing examples
-- Production best practices
-- Troubleshooting guide
-
----
 
 ## 🏗️ Workshop Architecture Notes
 
